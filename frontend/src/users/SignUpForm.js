@@ -11,19 +11,28 @@ function SignUpForm() {
 		email: '',
 		password: ''
 	})
-
 	async function handleSubmit(e) {
-		e.preventDefault()
-
-		await fetch(`http://localhost:5000/users/`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(user)
-		})
-
-		history.push(`/`)
+		e.preventDefault();
+	
+		try {
+			const response = await fetch('http://localhost:5432/users/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(user)
+			});
+	
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+	
+			const data = await response.json();
+			console.log(data); // Log the response data for debugging
+			history.push('/');
+		} catch (error) {
+			console.error('Error during fetch:', error);
+		}
 	}
 
 	return (
@@ -65,6 +74,18 @@ function SignUpForm() {
 							className="form-control"
 							id="email"
 							name="email"
+						/>
+					</div>
+					<div className="col-sm-6 form-group">
+						<label htmlFor="password">Password</label>
+						<input
+							type="password"
+							required
+							value={user.password}
+							onChange={e => setUser({ ...user, password: e.target.value })}
+							className="form-control"
+							id="password"
+							name="password"
 						/>
 					</div>
 				</div>
